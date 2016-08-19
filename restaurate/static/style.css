@@ -1,0 +1,142 @@
+/* https://color.adobe.com/pt/explore/newest/ */
+
+
+html {
+  height: 100%;
+}
+body {
+  min-height: 100%;
+}
+
+header {
+	background: #DC0014;
+}
+
+header img {
+	float: left;
+}
+
+nav ul.nav li {
+	display: inline;	
+	float: right;
+}
+
+nav ul.nav li.active a{
+		color:white;
+}
+
+.active {
+	background: #2a6496;
+}
+
+.jumbotron {
+	margin: 0px;
+	background-color: transparent;
+    text-align: center;
+    height: 100%;
+
+}
+
+/*.jumbotron::before {
+  content: "";
+  background: url("background.jpg") no-repeat center center; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-attachment: fixed;
+  opacity: 0.4;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  position: absolute;
+  z-index: -1;   
+}*/
+
+.jumbotron::after {
+  content: "";
+  background: url("background.jpg") no-repeat center center; 
+  -webkit-background-size: 100%;
+  -moz-background-size: 100%;
+  -o-background-size: 100%;
+  background-size: 100%;
+  background-attachment: fixed;
+  opacity: 0.4;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  position: absolute;
+  z-index: -1;   
+}
+
+.jumbotron h1 {
+	text-align: center;
+    padding: 1em 2em;
+  /* font-family: 'Oswald', sans-serif; */
+}
+
+.jumbotron h3 {
+    text-align: center;
+    color: black;
+}
+
+.jumbotron input {
+    width: 300px;
+    margin: 0 auto;
+}
+
+.jumbotron form {
+	padding-bottom: 50px;
+}
+
+/*.results-table h3 {
+  text-align: left;
+}*/
+
+/* tables */
+table.tablesorter {
+	font-family:arial;
+	background-color: #CDCDCD;
+	margin:10px 0pt 15px;
+	font-size: 8pt;
+	width: 100%;
+	text-align: left;
+    border: 5px solid #FFF;
+}
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	background-color: #e6EEEE;
+	border: 1px solid #FFF;
+	font-size: 8pt;
+	padding: 4px;
+	text-align: center;
+}
+table.tablesorter thead tr .header {
+	background-image: url(bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+  padding-right: 10px;
+}
+table.tablesorter tbody td {
+	color: #3D3D3D;
+	padding: 4px;
+	background-color: #FFF;
+	vertical-align: top;
+	text-align: center;
+}
+table.tablesorter tbody tr.odd td {
+	background-color:#F0F0F6;
+}
+table.tablesorter thead tr .headerSortUp {
+	background-image: url(asc.gif);
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url(desc.gif);
+}
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+  background-color: #8dbdd8;
+}
