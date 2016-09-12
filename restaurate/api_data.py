@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import requests
 import logging
 from pprint import pprint as pp
+
+import requests
+
 from name_match import *
 from utility import *
 import api_keys

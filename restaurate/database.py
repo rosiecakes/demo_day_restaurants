@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import sqlite3
 import datetime
+import logging
+
+import sqlite3
+from flask import g
+
 import utility
 import config
-import logging
-from flask import g
 from restaurate import app
 
 
@@ -64,7 +66,8 @@ def check_time_stamp(location):
         SELECT timestamp FROM {0}
         """.format(utility.scrub_tablename(location)))
 
-    tableDate = datetime.datetime.strptime(c.fetchone()[0], "%Y-%m-%d %H:%M:%S.%f")
+    tableDate = datetime.datetime.strptime(
+        c.fetchone()[0], "%Y-%m-%d %H:%M:%S.%f")
     difference = abs(datetime.datetime.utcnow() - tableDate).days
     if difference < 30:
         c.close()
@@ -76,7 +79,9 @@ def check_time_stamp(location):
 def get_table(location, rest_dict):
     c = g.db.cursor()
     logging.debug("Reading results from database...")
-    for row in c.execute('SELECT * FROM {0} ORDER BY restaurate_rank ASC'.format(utility.scrub_tablename(location))):
+    for row in c.execute(
+                'SELECT * FROM {0} ORDER BY restaurate_rank ASC'.format(
+                    utility.scrub_tablename(location))):
             # logging.debug(row)
             rest_dict[row[1]] = {}
             rest_dict[row[1]]['restaurate_rank'] = row[0]
@@ -129,7 +134,8 @@ def create_table(location, rest_dict):
          rest_dict[restaurant]['zomato_price'], \
          rest_dict[restaurant]['cuisines'], \
          timestamp)
-        c.execute("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?)".format(utility.scrub_tablename(location)), restaurant_info)
+        c.execute("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?)".format(
+            utility.scrub_tablename(location)), restaurant_info)
 
     # Save (commit) the changes
     g.db.commit()

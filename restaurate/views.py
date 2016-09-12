@@ -12,6 +12,7 @@ from api_data import get_restaurant_data_from_apis
 # from library.config import LOGLEVEL   
 # import markdown
 
+
 @app.route('/', methods=['POST', 'GET'])
 def index():
     """Displays index page for web application

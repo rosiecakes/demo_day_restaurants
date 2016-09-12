@@ -7,6 +7,7 @@ import time
 
 import name_match
 
+
 def format_name(name):
     """Remove non alphanumeric/whitespace characers from user input or 
     restaurant data

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+
 import utility
 
 
@@ -16,7 +17,9 @@ def word_close_match(word1, word2):
         word_match_score = int((letter_match_count / float(len(word1))) * 100)
         if word_match_score >= 70:
             logging.debug("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-            logging.debug(word1.encode('utf-8') + " was close match to " + word2.encode('utf-8') + " with score of " + str(word_match_score))
+            logging.debug(word1.encode('utf-8') + " was close match to "
+                + word2.encode('utf-8') + " with score of " 
+                + str(word_match_score))
             return True
     return False
 
@@ -37,7 +40,8 @@ def get_restaurant_name_match_score(restaurant1, restaurant2):
     for word in rest1_words:
         if word in restaurant2 or close_match_in_word_list(word, rest2_words):
             rest1_words_match_count += 1
-    rest1_words_match_score = int((rest1_words_match_count / float(len(rest1_words))) * 100)
+    rest1_words_match_score = (
+        int((rest1_words_match_count / float(len(rest1_words))) * 100))
     return rest1_words_match_score
 
 
@@ -45,19 +49,27 @@ def good_restaurant_name_match_score(restaurant1, restaurant2):
     """Checks word match percentage is above 60% between restaurant1
     and restaurant2
     """
-    # Check if the words in the first restaurant are mostly a part of the second restaurant name
-    rest1_words_match_score = get_restaurant_name_match_score(restaurant1, restaurant2)
+    # Check if the words in the first restaurant are mostly a part of 
+    # the second restaurant name
+    rest1_words_match_score = get_restaurant_name_match_score(restaurant1, 
+        restaurant2)
     if rest1_words_match_score >= 60:
-        logging.info("Name score matched with score of " + str(rest1_words_match_score))
+        logging.info("Name score matched with score of "
+            + str(rest1_words_match_score))
         return True
-    # Check if the words in the second restaurant are mostly a part of the first restaurant name
-    rest2_words_match_score = get_restaurant_name_match_score(restaurant2, restaurant1) 
+    # Check if the words in the second restaurant are mostly a part of 
+    # the first restaurant name
+    rest2_words_match_score = get_restaurant_name_match_score(restaurant2, 
+        restaurant1) 
     if rest2_words_match_score >= 60:
-        logging.info("Split restaurant2 name score matched with score of " + str(rest2_words_match_score))
+        logging.info("Split restaurant2 name score matched with score of " 
+            + str(rest2_words_match_score))
         return True
-    # If it gets here the names do not match enough to satisfy what we're looking for
-    logging.info("Split restaurant name matching did not pass with scores of " + str(rest1_words_match_score) + \
-        " and " + str(rest2_words_match_score))
+    # If it gets here the names do not match enough to satisfy what 
+    # we're looking for
+    logging.info("Split restaurant name matching did not pass with scores of " 
+        + str(rest1_words_match_score) + " and " 
+        + str(rest2_words_match_score))
     return False
 
 
@@ -68,7 +80,7 @@ def restaurant_name_split_match(restaurant1, restaurant2):
     logging.debug("Restaurant 2: " + restaurant2.encode('utf-8'))
     restaurant1 = utility.format_name(restaurant1).lower()
     restaurant2 = utility.format_name(restaurant2).lower()    
-    # First do a fast check if one name is a part of the other and one is just longer
+    # First do a fast check if one name is a part of the other but one is longer
     # This saves time so the other function doesn't need to be called as much
     if restaurant1 in restaurant2 or restaurant2 in restaurant1:
         logging.debug("Name of one of restaurant part of the other, same place")
@@ -80,7 +92,8 @@ def restaurant_name_split_match(restaurant1, restaurant2):
 
 
 def word_abbreviation_match(word1, word2):
-    """Takes a word and checks if it is an abbreviation of another word (for addresses)
+    """Takes a word and checks if it is an abbreviation of another word 
+    This is used for addresses
     Order matters in this case so had to write my own function
     """
     word1_index = 0
@@ -97,14 +110,20 @@ def word_abbreviation_match(word1, word2):
 
 
 def abbreviation_match(word1, word2):
-    """We don't know which address word will be abbreviation so must check both ways"""
-    if word_abbreviation_match(word1, word2) or word_abbreviation_match(word2, word1):
+    """We don't know which address word will be abbreviation so must 
+    check both ways
+    """
+    if (word_abbreviation_match(word1, word2) 
+            or word_abbreviation_match(word2, word1)):
         return True
     return False
 
 
 def direction_word(word):
-    """Some addresses have or lack a direction, so I'm letting it skip this if it doesn't match"""
+    """Some addresses have or lack a direction, so I'm letting it skip 
+    this if it doesn't match
+    This isn't a good solution for multiple languages
+    """
     directions =['N', 'S', 'E', 'W', 'NORTH', 'SOUTH', 'EAST', 'WEST']
     if word.upper() in directions:
         return True
@@ -112,7 +131,8 @@ def direction_word(word):
 
 
 def address_match(address1, address2):
-    """Addresses are formatted differently in the APIs so need to try and match them dynamically 
+    """Addresses are formatted differently in the APIs so need to try and 
+    match them dynamically 
     Address word order matters in this case so had to write my own function
     """
     logging.debug("Address 1: " + address1.encode('utf-8'))
@@ -121,7 +141,8 @@ def address_match(address1, address2):
     address2_words = address2.lower().split(',')[0].split()
     addr1_index = 0
     addr2_index = 0
-    while (addr1_index < len(address1_words) and addr2_index < len(address2_words)):
+    while (addr1_index < len(address1_words) 
+            and addr2_index < len(address2_words)):
         if address1_words[addr1_index] == address2_words[addr2_index]:
             addr1_index += 1
             addr2_index += 1
@@ -133,8 +154,10 @@ def address_match(address1, address2):
             addr1_index += 1            
         elif direction_word(address2_words[addr2_index]):
             addr2_index += 1         
-        elif abbreviation_match(address1_words[addr1_index], address2_words[addr2_index]):
-            #The address suffix has the abbreviation and if matches is the last thing we care about
+        elif abbreviation_match(address1_words[addr1_index], 
+                address2_words[addr2_index]):
+            # The address suffix has the abbreviation and if matches is the 
+            # last thing we care about
             logging.debug("+++++++++++++++++++++++")
             logging.debug("Address match! Same place!?")           
             return True
