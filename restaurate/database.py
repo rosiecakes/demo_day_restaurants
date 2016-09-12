@@ -73,23 +73,23 @@ def check_time_stamp(location):
     return False
 
 
-def get_table(location, restaurant_dict):
+def get_table(location, rest_dict):
     c = g.db.cursor()
     logging.debug("Reading results from database...")
     for row in c.execute('SELECT * FROM {0} ORDER BY restaurate_rank ASC'.format(utility.scrub_tablename(location))):
             # logging.debug(row)
-            restaurant_dict[row[1]] = {}
-            restaurant_dict[row[1]]['restaurate_rank'] = row[0]
-            restaurant_dict[row[1]]['average_rating'] = row[2]
-            restaurant_dict[row[1]]['zomato_rating'] = row[3]
-            restaurant_dict[row[1]]['google_rating'] = row[4]
-            restaurant_dict[row[1]]['zomato_review_count'] = row[5]
-            restaurant_dict[row[1]]['zomato_price'] = row[6]
-            restaurant_dict[row[1]]['cuisines'] = row[7]
-            restaurant_dict[row[1]]['timestamp'] = row[8]
-    # logging.debug(pp(restaurant_dict))
+            rest_dict[row[1]] = {}
+            rest_dict[row[1]]['restaurate_rank'] = row[0]
+            rest_dict[row[1]]['average_rating'] = row[2]
+            rest_dict[row[1]]['zomato_rating'] = row[3]
+            rest_dict[row[1]]['google_rating'] = row[4]
+            rest_dict[row[1]]['zomato_review_count'] = row[5]
+            rest_dict[row[1]]['zomato_price'] = row[6]
+            rest_dict[row[1]]['cuisines'] = row[7]
+            rest_dict[row[1]]['timestamp'] = row[8]
+    # logging.debug(pp(rest_dict))
     c.close()
-    return restaurant_dict
+    return rest_dict
 
 
 def delete_table(location):
@@ -101,7 +101,7 @@ def delete_table(location):
     c.close()
 
 
-def create_table(location, restaurant_dict):
+def create_table(location, rest_dict):
     c = g.db.cursor()
     timestamp = datetime.datetime.utcnow()
     logging.debug("Getting data and creating new table")
@@ -118,16 +118,16 @@ def create_table(location, restaurant_dict):
                  timestamp text)'''.format(utility.scrub_tablename(location)))
 
     # Insert a row of data
-    for restaurant in restaurant_dict:
+    for restaurant in rest_dict:
         restaurant_info = \
-        (restaurant_dict[restaurant]['restaurate_rank'], 
+        (rest_dict[restaurant]['restaurate_rank'], 
          restaurant, \
-         restaurant_dict[restaurant]['average_rating'], \
-         restaurant_dict[restaurant]['zomato_rating'], \
-         restaurant_dict[restaurant]['google_rating'], \
-         restaurant_dict[restaurant]['zomato_review_count'], \
-         restaurant_dict[restaurant]['zomato_price'], \
-         restaurant_dict[restaurant]['cuisines'], \
+         rest_dict[restaurant]['average_rating'], \
+         rest_dict[restaurant]['zomato_rating'], \
+         rest_dict[restaurant]['google_rating'], \
+         rest_dict[restaurant]['zomato_review_count'], \
+         rest_dict[restaurant]['zomato_price'], \
+         rest_dict[restaurant]['cuisines'], \
          timestamp)
         c.execute("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?)".format(utility.scrub_tablename(location)), restaurant_info)
 

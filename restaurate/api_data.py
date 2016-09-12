@@ -9,7 +9,7 @@ import api_keys
 import config
 
 
-def get_google_restaurants(location, coordinates, restaurant_dict):
+def get_google_restaurants(location, coordinates, rest_dict):
     """ This gets the top 20 restaurants based on location entered ranked
     by google prominence (factors in popularity, rating, etc) from
     Google Places API
@@ -35,18 +35,18 @@ def get_google_restaurants(location, coordinates, restaurant_dict):
         for item in r.json()['results']:
             restaurant = item['name']
             if 'rating' in item.keys():
-                restaurant_dict[restaurant] = {}
-                restaurant_dict[restaurant]['google_prominence'] = r.json()['results'].index(item) + 1
-                # restaurant_dict[restaurant]['address'] = item['formatted_address']
-                restaurant_dict[restaurant]['address'] = item['vicinity']
-                restaurant_dict[restaurant]['google_rating'] = item['rating']
-                restaurant_dict[restaurant]['google_id'] = item['place_id']
-                restaurant_dict[restaurant]['latitude'] = item['geometry']['location']['lat']
-                restaurant_dict[restaurant]['longitude'] = item['geometry']['location']['lng']
-                if float(restaurant_dict[restaurant]['google_rating']) < 2:
+                rest_dict[restaurant] = {}
+                rest_dict[restaurant]['google_prominence'] = r.json()['results'].index(item) + 1
+                # rest_dict[restaurant]['address'] = item['formatted_address']
+                rest_dict[restaurant]['address'] = item['vicinity']
+                rest_dict[restaurant]['google_rating'] = item['rating']
+                rest_dict[restaurant]['google_id'] = item['place_id']
+                rest_dict[restaurant]['latitude'] = item['geometry']['location']['lat']
+                rest_dict[restaurant]['longitude'] = item['geometry']['location']['lng']
+                if float(rest_dict[restaurant]['google_rating']) < 2:
                     # Removes restaurants ratings less than 2 because we don't want bad results
                     logging.debug(restaurant + " rating less than 2 in google, removing from list")
-                    restaurant_dict.pop(restaurant, None)   
+                    rest_dict.pop(restaurant, None)   
             else:
                 logging.debug(restaurant + " not rated in google, skipping from list")
 
@@ -66,7 +66,7 @@ def get_zomato_city_id(coordinates):
     return city_id
 
 
-def get_zomato_restaurants(city_id, restaurant_dict):
+def get_zomato_restaurants(city_id, rest_dict):
     """ Gets the top 20 restaurants from Zomato API for the city_id"""
     # Can try and search zones but API documentation sucks, or search by lat/lon for zip codes
     # Also can add functionality to search by category later
@@ -88,48 +88,48 @@ def get_zomato_restaurants(city_id, restaurant_dict):
            aren't filted will require extra API calls
            """
 
-            # for restaurant in restaurant_dict.keys():
+            # for restaurant in rest_dict.keys():
             #     if restaurant_name_split_match(item['restaurant']['name'], restaurant):
             #         logging.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             #         logging.debug("Potential duplicate restaurant found!")   
             #         logging.debug("Restaurant 1: " + item['restaurant']['name'].encode('utf-8'))
             #         logging.debug("Restaurant 2: " + restaurant.encode('utf-8'))                                     
-            #         logging.debug("Address 1: " + restaurant_dict[restaurant]['address'].encode('utf-8'))
+            #         logging.debug("Address 1: " + rest_dict[restaurant]['address'].encode('utf-8'))
             #         logging.debug("Address 2: " + item['restaurant']['location']['address'].encode('utf-8'))                                     
-            #         if address_match(restaurant_dict[restaurant]['address'], item['restaurant']['location']['address']):
+            #         if address_match(rest_dict[restaurant]['address'], item['restaurant']['location']['address']):
             #             break
             # else:
             restaurant = item['restaurant']['name']
-            if item['restaurant']['name'] not in restaurant_dict.keys():
-                restaurant_dict[restaurant] = {}
-                restaurant_dict[restaurant]['latitude'] = item['restaurant']['location']['latitude']
-                restaurant_dict[restaurant]['longitude'] = item['restaurant']['location']['longitude']
-                restaurant_dict[restaurant]['address'] = item['restaurant']['location']['address']
-            restaurant_dict[restaurant]['zomato_rating'] = item['restaurant']['user_rating']['aggregate_rating']
-            restaurant_dict[restaurant]['zomato_id'] = item['restaurant']['id']
-            restaurant_dict[restaurant]['zomato_review_count'] = item['restaurant']['user_rating']['votes']
-            restaurant_dict[restaurant]['zomato_ranking'] = r.json()['restaurants'].index(item) + 1
-            restaurant_dict[restaurant]['zomato_price'] = int(item['restaurant']['price_range'])  * '$'
-            restaurant_dict[restaurant]['avg_cost_for_2'] = item['restaurant']['average_cost_for_two']
-            restaurant_dict[restaurant]['cuisines'] = item['restaurant']['cuisines']
+            if item['restaurant']['name'] not in rest_dict.keys():
+                rest_dict[restaurant] = {}
+                rest_dict[restaurant]['latitude'] = item['restaurant']['location']['latitude']
+                rest_dict[restaurant]['longitude'] = item['restaurant']['location']['longitude']
+                rest_dict[restaurant]['address'] = item['restaurant']['location']['address']
+            rest_dict[restaurant]['zomato_rating'] = item['restaurant']['user_rating']['aggregate_rating']
+            rest_dict[restaurant]['zomato_id'] = item['restaurant']['id']
+            rest_dict[restaurant]['zomato_review_count'] = item['restaurant']['user_rating']['votes']
+            rest_dict[restaurant]['zomato_ranking'] = r.json()['restaurants'].index(item) + 1
+            rest_dict[restaurant]['zomato_price'] = int(item['restaurant']['price_range'])  * '$'
+            rest_dict[restaurant]['avg_cost_for_2'] = item['restaurant']['average_cost_for_two']
+            rest_dict[restaurant]['cuisines'] = item['restaurant']['cuisines']
             # Removes restaurants that have 0 or low ratings
-            if float(restaurant_dict[restaurant]['zomato_rating']) < 2:
+            if float(rest_dict[restaurant]['zomato_rating']) < 2:
                 logging.debug(restaurant + " rating less than 2 in zomato, removing from list")
-                restaurant_dict.pop(restaurant, None)
+                rest_dict.pop(restaurant, None)
      
 
-def get_google_data_for_zomato_restaurants(restaurant_dict):
+def get_google_data_for_zomato_restaurants(rest_dict):
     """ Finds restaurants from the Zomato results that did not
     intersect with Google results and fills in Google data
     for them one at a time
     """
-    for restaurant in restaurant_dict.keys():
-        if 'google_rating' not in restaurant_dict[restaurant].keys():
+    for restaurant in rest_dict.keys():
+        if 'google_rating' not in rest_dict[restaurant].keys():
             # Search for matching restaurant using coordinates, name, address, and radius
             r = requests.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json' +
-                '?location=' + restaurant_dict[restaurant]['latitude'] + ',' + restaurant_dict[restaurant]['longitude'] +
+                '?location=' + rest_dict[restaurant]['latitude'] + ',' + rest_dict[restaurant]['longitude'] +
                 '&radius=' + str(500) +
-                '&keyword=' + format_address(restaurant_dict[restaurant]['address']) +
+                '&keyword=' + format_address(rest_dict[restaurant]['address']) +
                 '&name=' + format_name(restaurant) + 
                 '&key=' + api_keys.GOOGLE_API_KEY)
 
@@ -142,54 +142,54 @@ def get_google_data_for_zomato_restaurants(restaurant_dict):
                         # Check if name matches or address matches to verify match
                         # There are rare situations where name match can't detect the match so we check address too    
                         if restaurant_name_split_match(restaurant, item['name']) \
-                        or address_match(restaurant_dict[restaurant]['address'], item['vicinity']):
+                        or address_match(rest_dict[restaurant]['address'], item['vicinity']):
                             matched_restaurant = item
                             break
                     else:    
                         # If Zomato restaurant did not match any of results in Google, remove it
                         logging.debug("Name in google not matching close enough to what was in Zomato... removing")
-                        restaurant_dict.pop(restaurant, None)
+                        rest_dict.pop(restaurant, None)
                         continue
 
                     # Get data now that restaurant match verified (if it's rated)
                     if 'rating' in matched_restaurant.keys():
-                        restaurant_dict[restaurant]['google_id'] = matched_restaurant['place_id']
-                        restaurant_dict[restaurant]['google_rating'] = matched_restaurant['rating']
+                        rest_dict[restaurant]['google_id'] = matched_restaurant['place_id']
+                        rest_dict[restaurant]['google_rating'] = matched_restaurant['rating']
                         # Remove restaurant if rating is low for quality purposes
-                        if float(restaurant_dict[restaurant]['google_rating']) < 2:
+                        if float(rest_dict[restaurant]['google_rating']) < 2:
                             logging.debug(restaurant + " rating less than 2 in google, removing from list")
-                            restaurant_dict.pop(restaurant, None)                            
+                            rest_dict.pop(restaurant, None)                            
                     else:
                         # No results found so remove that restaurant from the list 
                         logging.debug(restaurant.encode('utf-8') + " not rated in google, removing from list")
-                        restaurant_dict.pop(restaurant, None)
+                        rest_dict.pop(restaurant, None)
                 else:
                     # Zero Results found
                     logging.info(r.json()['status'])
                     if r.json()['status'] == "ZERO_RESULTS":
                         logging.info(restaurant.encode('utf-8') + " found no results in google, continuing")
-                        restaurant_dict.pop(restaurant, None)          
+                        rest_dict.pop(restaurant, None)          
                     if 'error_message' in r.json().keys():
                         logging.error(r.json()['error_message'])
             else:
                 # Request failure
                 logging.error(restaurant.encode('utf-8') + "google request was not okay, status " + str(r.status_code) + " " + r.json()['status'])
                 logging.info(restaurant.encode('utf-8') + " being removed due to request failure")
-                restaurant_dict.pop(restaurant, None)
+                rest_dict.pop(restaurant, None)
 
 
-def get_zomato_data_for_google_restaurants(restaurant_dict):
+def get_zomato_data_for_google_restaurants(rest_dict):
     """ Finds restaurants from the Google results that did not
     intersect with Zomato results and fills in Google data
     for them one at a time
     """
-    for restaurant in restaurant_dict.keys():
+    for restaurant in rest_dict.keys():
         # Search for matching restaurant using coordinates, name, and radius
-        if 'zomato_rating' not in restaurant_dict[restaurant].keys():
+        if 'zomato_rating' not in rest_dict[restaurant].keys():
             r = requests.get('https://developers.zomato.com/api/v2.1/search' +
                 '?q=' + restaurant + 
-                '&lat=' + str(restaurant_dict[restaurant]['latitude']) +
-                '&lon=' + str(restaurant_dict[restaurant]['longitude']) +
+                '&lat=' + str(rest_dict[restaurant]['latitude']) +
+                '&lon=' + str(rest_dict[restaurant]['longitude']) +
                 '&radius=500' +
                 '&sort=rating',
                  headers=config.zomato_header)
@@ -203,62 +203,62 @@ def get_zomato_data_for_google_restaurants(restaurant_dict):
                         # Check if name matches or address matches to verify match
                         # There are rare situations where name match can't detect the match so we check address too
                         if restaurant_name_split_match(restaurant, item['restaurant']['name']) \
-                        or address_match(restaurant_dict[restaurant]['address'], item['restaurant']['location']['address']):
+                        or address_match(rest_dict[restaurant]['address'], item['restaurant']['location']['address']):
                             matched_restaurant = item
                             break
                     else:     
                         # If Google restaurant did not match any of results in Zomato, remove it
                         logging.debug("Name in Zomato not matching close enough to what was in Google... removing")
-                        restaurant_dict.pop(restaurant, None)
+                        rest_dict.pop(restaurant, None)
                         continue
                     # Get data now that restaurant match verified
-                    restaurant_dict[restaurant]['zomato_id'] = matched_restaurant['restaurant']['id']
-                    restaurant_dict[restaurant]['zomato_rating'] = matched_restaurant['restaurant']['user_rating']['aggregate_rating']
-                    restaurant_dict[restaurant]['zomato_review_count'] = matched_restaurant['restaurant']['user_rating']['votes']
-                    restaurant_dict[restaurant]['zomato_price'] = int(matched_restaurant['restaurant']['price_range']) * '$'
-                    restaurant_dict[restaurant]['avg_cost_for_2'] = matched_restaurant['restaurant']['average_cost_for_two']
-                    restaurant_dict[restaurant]['cuisines'] = matched_restaurant['restaurant']['cuisines']
+                    rest_dict[restaurant]['zomato_id'] = matched_restaurant['restaurant']['id']
+                    rest_dict[restaurant]['zomato_rating'] = matched_restaurant['restaurant']['user_rating']['aggregate_rating']
+                    rest_dict[restaurant]['zomato_review_count'] = matched_restaurant['restaurant']['user_rating']['votes']
+                    rest_dict[restaurant]['zomato_price'] = int(matched_restaurant['restaurant']['price_range']) * '$'
+                    rest_dict[restaurant]['avg_cost_for_2'] = matched_restaurant['restaurant']['average_cost_for_two']
+                    rest_dict[restaurant]['cuisines'] = matched_restaurant['restaurant']['cuisines']
                     # Remove restaurant if rating is low for quality purposes
-                    if float(restaurant_dict[restaurant]['zomato_rating']) < 2:
+                    if float(rest_dict[restaurant]['zomato_rating']) < 2:
                         logging.debug(restaurant.encode('utf-8') + " rating less than 2 in zomato, removing from list")
-                        restaurant_dict.pop(restaurant, None)                       
+                        rest_dict.pop(restaurant, None)                       
                 else:
                     # No results found so remove that restaurant from the list 
                     logging.info(restaurant.encode('utf-8') + " not found in zomato, removing from list")
-                    restaurant_dict.pop(restaurant, None)
+                    rest_dict.pop(restaurant, None)
             else:
                 # Request failure
                 logging.error(restaurant.encode('utf-8') + "zomato request was not okay, status " + str(r.status_code))
                 logging.info(restaurant.encode('utf-8') + " being removed due to request failure")
-                restaurant_dict.pop(restaurant, None)
+                rest_dict.pop(restaurant, None)
 
 
 
-def get_restaurant_data_from_apis(location, coordinates, restaurant_dict):
+def get_restaurant_data_from_apis(location, coordinates, rest_dict):
     """Runs all the API data collection functions to get complete
     restaurant information
     """
-    get_google_restaurants(location, coordinates, restaurant_dict)
+    get_google_restaurants(location, coordinates, rest_dict)
     city_id = get_zomato_city_id(coordinates)
-    get_zomato_restaurants(city_id, restaurant_dict)
-    get_google_data_for_zomato_restaurants(restaurant_dict)
-    get_zomato_data_for_google_restaurants(restaurant_dict)
+    get_zomato_restaurants(city_id, rest_dict)
+    get_google_data_for_zomato_restaurants(rest_dict)
+    get_zomato_data_for_google_restaurants(rest_dict)
     # getGoogleReviewCountData()
 
 
 # def getGoogleReviewCountData():
-#     for restaurant in restaurant_dict.keys():
-#         if 'google_review_count' not in restaurant_dict[restaurant].keys():
+#     for restaurant in rest_dict.keys():
+#         if 'google_review_count' not in rest_dict[restaurant].keys():
 #             r = requests.get('https://maps.googleapis.com/maps/api/place/details/json' +
-#                 '?placeid=' + restaurant_dict[restaurant]['google_id'] +
+#                 '?placeid=' + rest_dict[restaurant]['google_id'] +
 #                 '&key=' + GOOGLE_API_KEY)
 #             if r.ok:
 #                 logging.debug(pp(r.json()))
 #                 break
 #                 if 'user_ratings_total' in r.json()['result'].keys():
-#                     restaurant_dict[restaurant]['google_review_count'] = r.json()['result']['user_ratings_total']
+#                     rest_dict[restaurant]['google_review_count'] = r.json()['result']['user_ratings_total']
 #                 else:
 #                     logging.debug(restaurant + " not rated in google, removing from list")
-#                     restaurant_dict.pop(restaurant, None)        
+#                     rest_dict.pop(restaurant, None)        
 
 

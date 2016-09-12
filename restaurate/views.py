@@ -45,7 +45,7 @@ def show_restaurants(location_name):
         geolocator = Nominatim()
         place = geolocator.geocode(location)
         coordinates = (place.latitude, place.longitude)
-        restaurant_dict = {}
+        rest_dict = {}
 
         # Set up logging file for specific location
         file='logs\{}.txt'.format(location)
@@ -62,7 +62,7 @@ def show_restaurants(location_name):
                 and check_time_stamp(location)):
             # If table exists, time stamp exists, and time stamp is up to date
             # read from table
-            get_table(location, restaurant_dict)
+            get_table(location, rest_dict)
         else:
             # If table exists but time stamp does not exist (incomplete)
             # or is older than 30 days, delete the table
@@ -73,10 +73,10 @@ def show_restaurants(location_name):
 
             # Get data from APIs and create new table
             get_restaurant_data_from_apis(location, coordinates, 
-                restaurant_dict)
-            remove_duplicate_restaurants(restaurant_dict)
-            calculate_statistics(restaurant_dict)
-            create_table(location, restaurant_dict)
+                rest_dict)
+            remove_duplicate_restaurants(rest_dict)
+            calculate_statistics(rest_dict)
+            create_table(location, rest_dict)
         # Calculate time of search
         end = time.time()
         elapsed = end - start
@@ -84,7 +84,7 @@ def show_restaurants(location_name):
         return render_template('table.html', 
                                 location=place.address, 
                                 elapsed_time=elapsed, 
-                                restaurant_dict=restaurant_dict)
+                                rest_dict=rest_dict)
 
 
 # @app.route('/about')
