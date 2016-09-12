@@ -1,2 +1,3 @@
 *.pyc
 restaurate/api_keys.py
+logs/*
