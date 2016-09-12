@@ -49,11 +49,11 @@ def show_restaurants(location_name):
         rest_dict = {}
 
         # Set up logging file for specific location
-        file='logs\{}.txt'.format(location)
+        file='logs\{}.txt'.format(location.title())
         log = logging.getLogger()  # root logger
         for hdlr in log.handlers[:]:  # remove all old handlers
             log.removeHandler(hdlr)
-        logging.basicConfig(filename=file, level=logging.DEBUG, 
+        logging.basicConfig(filename=file, filemode="w", level=logging.DEBUG, 
             format='%(asctime)s - %(levelname)s - %(message)s')
 
         # Check if we can get data from database 

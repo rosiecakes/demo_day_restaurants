@@ -6,7 +6,8 @@ from name_match import *
 import unittest 
 import logging
 
-logging.basicConfig(filename='../logs/unittest.txt', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='../logs/unittest.txt', level=logging.DEBUG, 
+    filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
 
 class NameMatchTestCase(unittest.TestCase):
     
@@ -112,13 +113,13 @@ class NameMatchTestCase(unittest.TestCase):
         self.assertFalse(restaurant_name_split_match(restaurant1, restaurant2))  
               
     # def test_restaurant_name_match21(self):
-        #This can pass if I can fit 80% of letters into the other for each word
-        #However removing this isnt as bad as a false positive match
-        #Less data is better than wrong data
-        # I think this adds too much extra code for one specific case so leaving it out
-        # restaurant1 = "Luigi's Pasta & Pizzeria Restaurant"
-        # restaurant2 = "Luigi's Pizza"
-        # self.assertTrue(restaurant_name_split_match(restaurant1, restaurant2))    
+    #     # This can pass if I can fit 80% of letters into the other for each word
+    #     # However removing this isnt as bad as a false positive match
+    #     # Less data is better than wrong data
+    #     # I think this adds too much extra code for one specific case so leaving it out
+    #     restaurant1 = "Luigi's Pasta & Pizzeria Restaurant"
+    #     restaurant2 = "Luigi's Pizza"
+    #     self.assertTrue(restaurant_name_split_match(restaurant1, restaurant2))    
 
     def test_restaurant_name_match22(self):
         restaurant1 = "Genghis Grill - The Mongolian Stir Fry"
