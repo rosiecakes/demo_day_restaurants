@@ -2,6 +2,9 @@
 
 import logging
 
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+
 import utility
 
 
@@ -164,3 +167,43 @@ def address_match(address1, address2):
         else:
             break
     return False
+
+
+def restaurant_name_fuzzy_match(restaurant1, restaurant2):
+    """Checks for a match between two restaurant names
+    This is actually slower than my own matching method so not using it for now
+    """
+    logging.debug("****************")
+    logging.debug("Restaurant 1: " + restaurant1.encode('utf-8'))
+    logging.debug("Restaurant 2: " + restaurant2.encode('utf-8'))
+    restaurant1 = utility.format_name(restaurant1).lower()
+    restaurant2 = utility.format_name(restaurant2).lower()    
+    # First do a fast check if one name is a part of the other but one is longer
+    # This saves time so the other function doesn't need to be called as much
+    if restaurant1 in restaurant2 or restaurant2 in restaurant1:
+        logging.debug("Name of one of restaurant part of the other, same place")
+        return True
+    # Use fuzzy wuzzy to see score
+    # simple_ratio_score = fuzz.ratio(restaurant1, restaurant2)
+    # logging.debug("Simple Ratio: " + str(simple_ratio_score))
+    partial_ratio_score = fuzz.partial_ratio(restaurant1, restaurant2)
+    logging.debug("Partial Ratio: " + str(partial_ratio_score))
+    # token_sort_ratio_score = fuzz.token_sort_ratio(restaurant1, restaurant2)
+    # logging.debug("Token Sort Ratio: " + str(token_sort_ratio_score))
+    token_set_ratio_score = fuzz.token_set_ratio(restaurant1, restaurant2)
+    logging.debug("Token Set Ratio: " + str(token_set_ratio_score))
+    # fuzzy_average_4 = ((float(simple_ratio_score) + partial_ratio_score 
+    #             + token_sort_ratio_score + token_set_ratio_score) / 4)
+    # logging.debug("Fuzzy Average 4: " + str(fuzzy_average_4))
+    fuzzy_average_2 = ((float(partial_ratio_score)  
+                    + token_set_ratio_score) / 2)
+    logging.debug("Fuzzy Average 2: " + str(fuzzy_average_2))
+    fuzzy_max_2 = max(partial_ratio_score, token_set_ratio_score)
+    # fuzzy_max_4 = max(simple_ratio_score, partial_ratio_score, 
+    #             token_sort_ratio_score, token_set_ratio_score)    
+    logging.debug("Fuzzy Max: " + str(fuzzy_max_2))
+    if (fuzzy_max_2 >= 80
+            or (fuzzy_max_2 > 70 and fuzzy_average_2 > 70)):
+        return True
+    return False
+
