@@ -6,8 +6,14 @@ import logging
 import sqlite3
 from flask import g
 
-import utility
-import config
+try:
+    from utility import *
+except:
+    from .utility import scrub_tablename
+
+# import config
+from .config import config
+
 from restaurate import app
 
 
@@ -40,7 +46,7 @@ def check_table_exists(location):
         SELECT count(*) 
         FROM sqlite_master 
         WHERE type='table' AND name='{0}'
-        """.format(utility.scrub_tablename(location)))
+        """.format(scrub_tablename(location)))
     if c.fetchone()[0] == 1:
         c.close()
         return True
@@ -52,7 +58,7 @@ def time_stamp_exists(location):
     c = g.db.cursor()
     c.execute("""
         SELECT timestamp FROM {0}
-        """.format(utility.scrub_tablename(location)))
+        """.format(scrub_tablename(location)))
     if c.fetchone() != None:
         c.close()
         return True
@@ -64,7 +70,7 @@ def check_time_stamp(location):
     c = g.db.cursor()
     c.execute("""
         SELECT timestamp FROM {0}
-        """.format(utility.scrub_tablename(location)))
+        """.format(scrub_tablename(location)))
 
     tableDate = datetime.datetime.strptime(
         c.fetchone()[0], "%Y-%m-%d %H:%M:%S.%f")
@@ -81,7 +87,7 @@ def get_table(location, rest_dict):
     logging.debug("Reading results from database...")
     for row in c.execute(
                 'SELECT * FROM {0} ORDER BY restaurate_rank ASC'.format(
-                    utility.scrub_tablename(location))):
+                    scrub_tablename(location))):
             # logging.debug(row)
             rest_dict[row[1]] = {}
             rest_dict[row[1]]['restaurate_rank'] = row[0]
@@ -100,7 +106,7 @@ def get_table(location, rest_dict):
 def delete_table(location):
     c = g.db.cursor()
     logging.debug("Timestamp invalid, removing old table")
-    c.execute("DROP TABLE {0}".format(utility.scrub_tablename(location)))
+    c.execute("DROP TABLE {0}".format(scrub_tablename(location)))
     # Save (commit) the changes
     g.db.commit()
     c.close()
@@ -120,7 +126,7 @@ def create_table(location, rest_dict):
                  zomato_review_count integer,
                  zomato_price text, 
                  cuisines text, 
-                 timestamp text)'''.format(utility.scrub_tablename(location)))
+                 timestamp text)'''.format(scrub_tablename(location)))
 
     # Insert a row of data
     for restaurant in rest_dict:
@@ -135,7 +141,7 @@ def create_table(location, rest_dict):
          rest_dict[restaurant]['cuisines'], \
          timestamp)
         c.execute("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?)".format(
-            utility.scrub_tablename(location)), restaurant_info)
+            scrub_tablename(location)), restaurant_info)
 
     # Save (commit) the changes
     g.db.commit()

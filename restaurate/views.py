@@ -5,9 +5,21 @@ from flask import render_template, redirect, request, flash, url_for, Markup
 from geopy.geocoders import Nominatim
 
 from restaurate import app
-from utility import *
-from database import *
-from api_data import get_restaurant_data_from_apis
+
+try:
+    from utility import *
+except:
+    from .utility import format_name
+
+try:
+    from database import *
+except:
+    from .database import check_table_exists
+
+try:
+    from api_data import get_restaurant_data_from_apis
+except:
+    from .api_data import get_restaurant_data_from_apis
 
 # from library.config import LOGLEVEL   
 # import markdown
@@ -21,7 +33,7 @@ def index():
     """
     if request.method == 'POST':
         # Get location name from form
-        location = utility.format_name(request.form['location'])
+        location = format_name(request.form['location'])
         return redirect(url_for('show_restaurants', location_name=location))
     return render_template('layout.html')
 
@@ -35,13 +47,13 @@ def show_restaurants(location_name):
     """
     if request.method == 'POST':
         # Get location name from form
-        location = utility.format_name(request.form['location'])
+        location = format_name(request.form['location'])
         return redirect(url_for('show_restaurants', location_name=location))
     else:
         # Set up timer to time everything
         start = time.time()
         # Parse location to remove non-alphanumeric characters
-        location = utility.format_name(location_name)
+        location = format_name(location_name)
         # Use geopy to get coordinates for location and address
         geolocator = Nominatim()
         place = geolocator.geocode(location)

@@ -1,0 +1,7 @@
+2016-11-19 16:04:06,547 - INFO - 127.0.0.1 - - [19/Nov/2016 16:04:06] "GET /places/hartford HTTP/1.1" 500 -
+2016-11-19 16:04:06,568 - INFO - 127.0.0.1 - - [19/Nov/2016 16:04:06] "GET /places/hartford?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2016-11-19 16:04:06,570 - INFO - 127.0.0.1 - - [19/Nov/2016 16:04:06] "GET /places/hartford?__debugger__=yes&cmd=resource&f=jquery.js HTTP/1.1" 200 -
+2016-11-19 16:04:06,573 - INFO - 127.0.0.1 - - [19/Nov/2016 16:04:06] "GET /places/hartford?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2016-11-19 16:04:06,829 - INFO - 127.0.0.1 - - [19/Nov/2016 16:04:06] "GET /places/hartford?__debugger__=yes&cmd=resource&f=ubuntu.ttf HTTP/1.1" 200 -
+2016-11-19 16:04:06,886 - INFO - 127.0.0.1 - - [19/Nov/2016 16:04:06] "GET /places/hartford?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2016-11-19 16:04:06,956 - INFO - 127.0.0.1 - - [19/Nov/2016 16:04:06] "GET /places/hartford?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -

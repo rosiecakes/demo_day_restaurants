@@ -5,10 +5,15 @@ from pprint import pprint as pp
 
 import requests
 
-from name_match import *
-from utility import *
-import api_keys
-import config
+# from name_match import *
+# from utility import *
+# import api_keys
+from . import config
+
+try:
+    from utility import *
+except:
+    from .utility import format_name
 
 
 def get_google_restaurants(location, coordinates, rest_dict):
@@ -23,7 +28,7 @@ def get_google_restaurants(location, coordinates, rest_dict):
         + '&radius=' + str(10000)
         + '&keyword=' + format_name(location)
         + '&type=' + 'restaurant'
-        + '&key=' + api_keys.GOOGLE_API_KEY)
+        + '&key=' + config.GOOGLE_API_KEY)
 
     # Text search way to search for results
     # This uses more API request tokens and seems worse

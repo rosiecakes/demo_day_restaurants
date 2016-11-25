@@ -5,7 +5,7 @@ import itertools
 import collections
 import time
 
-import name_match
+# import name_match
 
 
 def format_name(name):
